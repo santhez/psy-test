@@ -359,13 +359,23 @@ const APP = {
           Психолог. Работаю с людьми, у которых за плечами много опыта и мыслей, но внутри сейчас каша, ступор или усталость.
         </p>
 
-        <div class="recessed-tray">
+        <div class="recessed-tray" style="margin-bottom: 14px;">
           <div class="tray-label">
             <span class="status-pip" style="background: var(--color-amber); box-shadow: 0 0 6px var(--color-amber);"></span>
             <span>КУДА ВЫ ПОПАЛИ</span>
           </div>
           <div class="tray-text">
             Это тест «От жалобы к запросу». За 26 коротких вопросов он поможет перевести смутное состояние «что-то не так, не понимаю куда идти» в одну ясную задачу, с которой уже можно работать. Без диагнозов и воды.
+          </div>
+        </div>
+
+        <div class="recessed-tray" style="margin-bottom: 24px; border-color: rgba(250, 204, 21, 0.25); background: rgba(250, 204, 21, 0.04);">
+          <div class="tray-label" style="color: var(--color-neon);">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg>
+            <span>ПОДАРОК В КОНЦЕ</span>
+          </div>
+          <div class="tray-text">
+            Если пройдёте тест до конца, получите авторский <strong>планер на месяц в PDF</strong> — он поможет не распыляться и спокойно двигаться к своим целям.
           </div>
         </div>
 
@@ -648,9 +658,24 @@ const APP = {
           <ul class="explore-list">${exploreHtml}</ul>
         </div>
 
-        <div class="recessed-tray" style="margin-bottom: 24px;">
+        <div class="recessed-tray" style="margin-bottom: 20px;">
           <div class="tray-label" style="color: var(--color-neon);">НА ЧТО МОЖНО ОПЕРЕТЬСЯ</div>
           <div class="tray-text">${d.strength}</div>
+        </div>
+
+        <!-- Подарок за прохождение теста -->
+        <div class="recessed-tray" style="margin-bottom: 18px; border-color: rgba(250, 204, 21, 0.3); background: rgba(250, 204, 21, 0.04);">
+          <div class="tray-label" style="color: var(--color-neon); margin-bottom: 8px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg>
+            <span>ВАШ ПОДАРОК: ПЛАНЕР НА МЕСЯЦ</span>
+          </div>
+          <div class="tray-text" style="margin-bottom: 14px; font-size: 13.5px; color: #e5e7eb;">
+            Как и обещал — забирайте авторский планер. Можно распечатать или использовать на планшете, чтобы перевести фокус из головы в реальные шаги.
+          </div>
+          <a href="assets/planner_color_lifeos.pdf" download="Planner_Solyansky_Month.pdf" class="btn-translucent" style="width: 100%; text-decoration: none; border-color: rgba(250, 204, 21, 0.4); color: var(--color-neon);">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            <span>Скачать планер на месяц (PDF)</span>
+          </a>
         </div>
 
         <!-- Мягкое приглашение на демо-сессию (живой язык) -->
