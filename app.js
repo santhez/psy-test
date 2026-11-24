@@ -23,10 +23,38 @@ const APP = {
 
   init() {
     this.cacheDOM();
+    this.loadState();
     this.bindEvents();
     this.initSpotlight();
     this.initBackgroundCanvas();
     this.render();
+  },
+
+  saveState() {
+    try {
+      localStorage.setItem('solyansky_test_state_v1', JSON.stringify({
+        currentScreen: this.currentScreen,
+        answers: this.answers
+      }));
+    } catch (e) {}
+  },
+
+  loadState() {
+    try {
+      const raw = localStorage.getItem('solyansky_test_state_v1');
+      if (!raw) return;
+      const saved = JSON.parse(raw);
+      if (saved && saved.answers && (saved.currentScreen === 'result' || saved.currentScreen === 'planner')) {
+        this.answers = saved.answers;
+        this.currentScreen = saved.currentScreen;
+      }
+    } catch (e) {}
+  },
+
+  clearState() {
+    try {
+      localStorage.removeItem('solyansky_test_state_v1');
+    } catch (e) {}
   },
 
   cacheDOM() {
@@ -242,11 +270,20 @@ const APP = {
       } else if (action === 'continue-interstitial') {
         this.currentScreen = 'question';
         this.render();
+      } else if (action === 'open-planner') {
+        this.currentScreen = 'planner';
+        this.saveState();
+        this.render();
+      } else if (action === 'back-to-result') {
+        this.currentScreen = 'result';
+        this.saveState();
+        this.render();
       } else if (action === 'restart') {
         this.answers = {};
         this.currentIndex = 0;
         this.onboardingStep = 1;
         this.resetTimer();
+        this.clearState();
         this.currentScreen = 'hero';
         this.render();
       }
@@ -338,6 +375,7 @@ const APP = {
     else if (this.currentScreen === 'interstitial') this.renderInterstitial();
     else if (this.currentScreen === 'question') this.renderQuestion();
     else if (this.currentScreen === 'result') this.renderResult();
+    else if (this.currentScreen === 'planner') this.renderPlanner();
   },
 
   // ========================================================================
@@ -375,7 +413,7 @@ const APP = {
             <span>ПОДАРОК В КОНЦЕ</span>
           </div>
           <div class="tray-text">
-            Если пройдёте тест до конца, получите авторский <strong>планер на месяц в PDF</strong> — он поможет не распыляться и спокойно двигаться к своим целям.
+            Если пройдёте тест до конца, получите авторский <strong>планер на 4 недели в PDF</strong> — он поможет не распыляться и спокойно двигаться к своим целям.
           </div>
         </div>
 
@@ -606,6 +644,7 @@ const APP = {
     this.stopTimer();
     if (this.timerEl) this.timerEl.style.display = 'none';
     this.currentScreen = 'result';
+    this.saveState();
     this.updateProgress(100, 'DONE');
     this.render();
   },
@@ -659,37 +698,117 @@ const APP = {
           <div class="tray-text">${d.strength}</div>
         </div>
 
-        <!-- Подарок за прохождение теста -->
-        <div class="recessed-tray" style="margin-bottom: 18px; border-color: rgba(250, 204, 21, 0.3); background: rgba(250, 204, 21, 0.04);">
-          <div class="tray-label" style="color: var(--color-neon); margin-bottom: 8px;">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg>
-            <span>ВАШ ПОДАРОК: ПЛАНЕР НА МЕСЯЦ</span>
-          </div>
-          <div class="tray-text" style="margin-bottom: 14px; font-size: 13.5px; color: #e5e7eb;">
-            Как и обещал — забирайте авторский планер. Можно распечатать или использовать на планшете, чтобы перевести фокус из головы в реальные шаги.
-          </div>
-          <a href="assets/planner_color_lifeos.pdf" download="Planner_Solyansky_Month.pdf" class="btn-translucent" style="width: 100%; text-decoration: none; border-color: rgba(250, 204, 21, 0.4); color: var(--color-neon);">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-            <span>Скачать планер на месяц (PDF)</span>
-          </a>
-        </div>
-
-        <!-- Мягкое приглашение на демо-сессию (живой язык) -->
-        <div class="recessed-tray" style="margin-bottom: 14px; border-color: rgba(250, 204, 21, 0.25);">
+        <!-- Главный фокус: Приглашение на демо-сессию -->
+        <div class="recessed-tray" style="margin-bottom: 18px; border-color: rgba(250, 204, 21, 0.35); background: rgba(250, 204, 21, 0.05);">
           <div class="tray-label" style="color: var(--color-neon); margin-bottom: 8px;">БЕСПЛАТНАЯ ДЕМО-СЕССИЯ (25 МИНУТ)</div>
           <div class="tray-text" style="margin-bottom: 18px; font-size: 14px; color: #e5e7eb; line-height: 1.6;">
             Тест хорошо подсвечивает сам узел, но в одиночку бывает трудно понять, с какого края за него тянуть. Если хотите разобрать свой результат вживую, приходите на короткую демо-сессию. Созвонимся на 25 минут, спокойно посмотрим на вашу ситуацию и наметим, что с этим можно сделать. Никаких продаж в лоб и обязательств.
           </div>
 
-          <a href="${tgUrl}" target="_blank" class="btn-luminous-jade" style="width: 100%; text-decoration: none;">
+          <a href="${tgUrl}" target="_blank" rel="noopener" class="btn-luminous-jade" style="width: 100%; text-decoration: none;">
             <span>Записаться на бесплатную демо-сессию</span>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
           </a>
         </div>
 
+        <!-- Подарок: Переход на страницу инструкции к планеру -->
+        <div class="recessed-tray" style="margin-bottom: 14px; border-color: rgba(255, 255, 255, 0.12);">
+          <div class="tray-label" style="color: var(--color-amber); margin-bottom: 8px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg>
+            <span>ВАШ ПОДАРОК: ПЛАНЕР НА 4 НЕДЕЛИ</span>
+          </div>
+          <div class="tray-text" style="margin-bottom: 14px; font-size: 13.5px; color: #d1d5db;">
+            Я подготовил короткую инструкцию, как правильно вести этот планер по принципу «список дел наоборот», чтобы не душить себя задачами.
+          </div>
+          <button type="button" data-action="open-planner" class="btn-translucent" style="width: 100%; border-color: rgba(250, 204, 21, 0.35); color: var(--color-neon);">
+            <span>Открыть планер и инструкцию</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </button>
+        </div>
+
         <div style="text-align: center; margin-top: 4px;">
           <button data-action="restart" style="background: none; border: none; color: var(--text-dim); font-family: var(--font-ui); font-size: 12.5px; cursor: pointer; padding: 8px;">
             Пройти тест заново
+          </button>
+        </div>
+      </div>
+    `;
+  },
+
+  // ========================================================================
+  // Dedicated Planner Instruction & Download Page
+  // ========================================================================
+  renderPlanner() {
+    this.updateProgress(100, 'GIFT • PLANNER');
+    const tgMessage = encodeURIComponent('Добрый день! Я прошёл тест и хочу записаться на демо-сессию.');
+    const tgUrl = `${CONTACTS.telegramDirect}?text=${tgMessage}`;
+
+    this.container.innerHTML = `
+      <div class="glass-card">
+        <div style="margin-bottom: 18px;">
+          <button type="button" data-action="back-to-result" class="btn-translucent" style="padding: 8px 16px; font-size: 12.5px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            <span>Вернуться к результату</span>
+          </button>
+        </div>
+
+        <div class="dot-badge" style="margin-bottom: 14px; border-color: rgba(250, 204, 21, 0.4); color: var(--color-neon); align-self: flex-start;">
+          <span class="status-pip"></span>
+          <span>ПОДАРОК • 4 НЕДЕЛИ</span>
+        </div>
+
+        <h1 class="dot-h1" style="margin-bottom: 14px;">СПИСОК ДЕЛ НАОБОРОТ</h1>
+        <p class="ui-body" style="margin-bottom: 20px;">
+          Это моя авторская наработка. Обычные планеры только копят чувство вины за то, что не успел. Этот лист устроен по-другому: он возвращает опору и показывает, сколько ты на самом деле делаешь.
+        </p>
+
+        <div style="margin-bottom: 22px; border-radius: 16px; overflow: hidden; border: 1.5px solid rgba(250, 204, 21, 0.35); box-shadow: 0 12px 30px rgba(0,0,0,0.6);">
+          <img src="assets/planner_preview.webp" alt="Превью планера на 4 недели" style="width: 100%; display: block;">
+        </div>
+
+        <div class="recessed-tray" style="margin-bottom: 22px;">
+          <div class="tray-label" style="color: var(--color-neon); margin-bottom: 12px;">КАК ПОЛЬЗОВАТЬСЯ ПЛАНЕРОМ</div>
+          <ul class="explore-list" style="gap: 12px;">
+            <li class="explore-item">
+              <span style="color: var(--color-neon); font-family: var(--font-tech); font-weight: 700;">01</span>
+              <span><strong>Повесь на видное место.</strong> Распечатай лист и прикрепи на шкаф, стену или холодильник, чтобы все 4 недели были перед глазами.</span>
+            </li>
+            <li class="explore-item">
+              <span style="color: var(--color-neon); font-family: var(--font-tech); font-weight: 700;">02</span>
+              <span><strong>Записывай в конце дня то, что СДЕЛАЛ.</strong> Не только рабочие подвиги, но и бытовые дела. Так мозг перестаёт обесценивать день.</span>
+            </li>
+            <li class="explore-item">
+              <span style="color: var(--color-neon); font-family: var(--font-tech); font-weight: 700;">03</span>
+              <span><strong>Отмечай дела на будущее.</strong> Записывай важные задачи вперёд на нужные дни, чтобы не держать всё в голове и не забыть.</span>
+            </li>
+            <li class="explore-item">
+              <span style="color: var(--color-neon); font-family: var(--font-tech); font-weight: 700;">04</span>
+              <span><strong>Ставь галочки в привычках.</strong> Медитация, прогулка, вода, сон или всё, что важно именно для тебя в этом месяце.</span>
+            </li>
+            <li class="explore-item">
+              <span style="color: var(--color-neon); font-family: var(--font-tech); font-weight: 700;">05</span>
+              <span><strong>Выписывай победы и инсайты.</strong> В нижней части листа фиксируй главные осознавания и победы за эти 4 недели.</span>
+            </li>
+          </ul>
+        </div>
+
+        <a href="assets/planner_color_lifeos.pdf" target="_blank" rel="noopener" download="Planner_Solyansky_4_Weeks.pdf" class="btn-luminous-jade" style="width: 100%; text-decoration: none; margin-bottom: 14px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          <span>Скачать планер (PDF)</span>
+        </a>
+
+        <div class="recessed-tray" style="margin-bottom: 14px; text-align: center; padding: 16px;">
+          <div class="tray-text" style="font-size: 13.5px; color: #d1d5db; margin-bottom: 12px;">
+            Хотите разобрать ваш результат теста вживую на 25-минутной демо-сессии?
+          </div>
+          <a href="${tgUrl}" target="_blank" rel="noopener" class="btn-translucent" style="width: 100%; text-decoration: none; border-color: rgba(250, 204, 21, 0.35); color: var(--color-neon);">
+            <span>Записаться на бесплатную демо-сессию</span>
+          </a>
+        </div>
+
+        <div style="text-align: center;">
+          <button type="button" data-action="back-to-result" style="background: none; border: none; color: var(--text-dim); font-family: var(--font-ui); font-size: 13px; cursor: pointer; padding: 8px;">
+            ← Вернуться к результату теста
           </button>
         </div>
       </div>
