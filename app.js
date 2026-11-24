@@ -114,10 +114,11 @@ const APP = {
         const alpha = Math.max(0.06, Math.min(0.65, (1 - depthRatio * 0.75) * 0.55));
         const dotSize = Math.max(0.8, (1.1 - depthRatio * 0.6) * 2.6 * scale);
 
+        // Warm Yellow Gold (250, 204, 21) to Amber (245, 158, 11)
         const mix = (Math.sin(pt.phi * 2 + t) + 1) * 0.5;
-        const rCol = Math.round(0 + mix * 6);
-        const gCol = Math.round(255 - mix * 73);
-        const bCol = Math.round(136 + mix * 76);
+        const rCol = Math.round(250 - mix * 5);
+        const gCol = Math.round(204 - mix * 46);
+        const bCol = Math.round(21 - mix * 10);
 
         ctx.fillStyle = `rgba(${rCol}, ${gCol}, ${bCol}, ${alpha})`;
         ctx.beginPath();
@@ -347,17 +348,14 @@ const APP = {
 
     this.container.innerHTML = `
       <div class="glass-card">
-        <div class="hud-visual-box" style="padding: 10px 0 18px;">
-          <svg class="hud-ring-svg" viewBox="0 0 120 120" fill="none">
-            <circle cx="60" cy="60" r="52" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
-            <circle class="hud-ring-spin" cx="60" cy="60" r="44" stroke="#00ff88" stroke-width="1.5" stroke-dasharray="14 8 4 8" stroke-linecap="round"/>
-            <circle class="hud-ring-pulse" cx="60" cy="60" r="30" stroke="#06b6d4" stroke-width="1.5" stroke-dasharray="40 20"/>
-            <circle cx="60" cy="60" r="6" fill="#00ff88"/>
-          </svg>
+        <div class="hero-avatar-wrap">
+          <div class="hero-avatar-ring">
+            <img src="assets/hero_avatar.jpg" alt="Александр Солянский" class="hero-avatar-img">
+          </div>
         </div>
 
-        <h1 class="dot-h1">ПРИВЕТ. Я АЛЕКСАНДР СОЛЯНСКИЙ</h1>
-        <p class="ui-body">
+        <h1 class="dot-h1" style="text-align: center;">ПРИВЕТ. Я АЛЕКСАНДР СОЛЯНСКИЙ</h1>
+        <p class="ui-body" style="text-align: center;">
           Психолог. Работаю с людьми, у которых за плечами много опыта и мыслей, но внутри сейчас каша, ступор или усталость.
         </p>
 
@@ -398,11 +396,11 @@ const APP = {
       hudSvg = `
         <svg class="hud-ring-svg" viewBox="0 0 120 120" fill="none">
           <circle cx="60" cy="60" r="46" stroke="rgba(255,255,255,0.1)" stroke-width="1.2"/>
-          <circle cx="60" cy="60" r="24" stroke="#00ff88" stroke-width="1.8"/>
-          <line x1="60" y1="10" x2="60" y2="30" stroke="#06b6d4" stroke-width="1.5"/>
-          <line x1="60" y1="90" x2="60" y2="110" stroke="#06b6d4" stroke-width="1.5"/>
-          <line x1="10" y1="60" x2="30" y2="60" stroke="#06b6d4" stroke-width="1.5"/>
-          <line x1="90" y1="60" x2="110" y2="60" stroke="#06b6d4" stroke-width="1.5"/>
+          <circle cx="60" cy="60" r="24" stroke="#facc15" stroke-width="1.8"/>
+          <line x1="60" y1="10" x2="60" y2="30" stroke="#fbbf24" stroke-width="1.5"/>
+          <line x1="60" y1="90" x2="60" y2="110" stroke="#fbbf24" stroke-width="1.5"/>
+          <line x1="10" y1="60" x2="30" y2="60" stroke="#fbbf24" stroke-width="1.5"/>
+          <line x1="90" y1="60" x2="110" y2="60" stroke="#fbbf24" stroke-width="1.5"/>
         </svg>
       `;
       title = 'ЗАЧЕМ ЭТИ 26 ВОПРОСОВ';
@@ -413,7 +411,7 @@ const APP = {
       hudSvg = `
         <svg class="hud-ring-svg" viewBox="0 0 120 120" fill="none">
           <circle cx="60" cy="60" r="50" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
-          <path d="M18 60 H34 L42 36 L54 84 L66 28 L76 74 L84 60 H102" stroke="#00ff88" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M18 60 H34 L42 36 L54 84 L66 28 L76 74 L84 60 H102" stroke="#facc15" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           <circle cx="60" cy="60" r="38" stroke="rgba(245,158,11,0.25)" stroke-width="1" stroke-dasharray="4 6"/>
         </svg>
       `;
@@ -424,12 +422,12 @@ const APP = {
     } else if (step === 3) {
       hudSvg = `
         <svg class="hud-ring-svg" viewBox="0 0 120 120" fill="none">
-          <rect x="24" y="24" width="30" height="30" rx="8" stroke="#00ff88" stroke-width="1.6" fill="rgba(0,255,136,0.1)"/>
+          <rect x="24" y="24" width="30" height="30" rx="8" stroke="#facc15" stroke-width="1.6" fill="rgba(250,204,21,0.1)"/>
           <rect x="66" y="24" width="30" height="30" rx="8" stroke="rgba(255,255,255,0.2)" stroke-width="1.4"/>
           <rect x="24" y="66" width="30" height="30" rx="8" stroke="rgba(255,255,255,0.2)" stroke-width="1.4"/>
-          <rect x="66" y="66" width="30" height="30" rx="8" stroke="#06b6d4" stroke-width="1.6" fill="rgba(6,182,212,0.1)"/>
-          <path d="M33 39 L37 43 L45 34" stroke="#00ff88" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M75 81 L79 85 L87 76" stroke="#06b6d4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <rect x="66" y="66" width="30" height="30" rx="8" stroke="#fbbf24" stroke-width="1.6" fill="rgba(251,191,36,0.1)"/>
+          <path d="M33 39 L37 43 L45 34" stroke="#facc15" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M75 81 L79 85 L87 76" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       `;
       title = 'МОЖНО ВЫБИРАТЬ НЕСКОЛЬКО';
@@ -484,7 +482,7 @@ const APP = {
     this.container.innerHTML = `
       <div class="glass-card">
         <div class="interstitial-wrap">
-          <div class="dot-badge" style="margin-bottom: 24px; border-color: rgba(6,182,212,0.4); color: var(--color-cyan);">
+          <div class="dot-badge" style="margin-bottom: 24px; border-color: rgba(251,191,36,0.4); color: var(--color-cyan);">
             <span class="status-pip" style="background: var(--color-cyan); box-shadow: 0 0 8px var(--color-cyan);"></span>
             <span>${data.tag}</span>
           </div>
@@ -623,7 +621,7 @@ const APP = {
 
     this.container.innerHTML = `
       <div class="glass-card">
-        <div class="dot-badge" style="margin-bottom: 18px; border-color: rgba(0,255,136,0.4); color: var(--color-neon); align-self: flex-start;">
+        <div class="dot-badge" style="margin-bottom: 18px; border-color: rgba(250,204,21,0.4); color: var(--color-neon); align-self: flex-start;">
           <span class="status-pip"></span>
           <span>РАЗБОР ГОТОВ</span>
         </div>
@@ -657,7 +655,7 @@ const APP = {
         </div>
 
         <!-- Мягкое приглашение на демо-сессию (живой язык) -->
-        <div class="recessed-tray" style="margin-bottom: 14px; border-color: rgba(0, 255, 136, 0.25);">
+        <div class="recessed-tray" style="margin-bottom: 14px; border-color: rgba(250, 204, 21, 0.25);">
           <div class="tray-label" style="color: var(--color-neon); margin-bottom: 8px;">БЕСПЛАТНАЯ ДЕМО-СЕССИЯ (25 МИНУТ)</div>
           <div class="tray-text" style="margin-bottom: 18px; font-size: 14px; color: #e5e7eb; line-height: 1.6;">
             Тест хорошо подсвечивает сам узел, но в одиночку бывает трудно понять, с какого края за него тянуть. Если хотите разобрать свой результат вживую, приходите на короткую демо-сессию. Созвонимся на 25 минут, спокойно посмотрим на вашу ситуацию и наметим, что с этим можно сделать. Никаких продаж в лоб и обязательств.
