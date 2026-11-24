@@ -350,7 +350,7 @@ const APP = {
       <div class="glass-card">
         <div class="hero-avatar-wrap">
           <div class="hero-avatar-ring">
-            <img src="assets/hero_avatar.jpg" alt="Александр Солянский" class="hero-avatar-img">
+            <img src="assets/hero_avatar.webp" alt="Александр Солянский" class="hero-avatar-img">
           </div>
         </div>
 
