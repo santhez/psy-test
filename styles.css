@@ -1,0 +1,724 @@
+/* ==========================================================================
+   Aura Glass (Spatial Somatic OS) — v3.0 Master Spec Implementation
+   Font Triad: YantarDot + Sora + Space Grotesk
+   ========================================================================== */
+
+:root {
+  --bg-dark: #050806;
+  
+  /* VisionOS Physical Glass Materials */
+  --glass-bg: rgba(12, 18, 14, 0.58);
+  --glass-surface: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
+  --glass-border: 1px solid rgba(255, 255, 255, 0.16);
+  --glass-border-subtle: 1px solid rgba(255, 255, 255, 0.09);
+  --glass-shadow: 
+    0 24px 48px -12px rgba(0, 0, 0, 0.7),
+    0 12px 24px -12px rgba(0, 0, 0, 0.5),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.35);
+  --glass-blur: blur(44px) saturate(210%);
+
+  /* Recessed Tray */
+  --tray-bg: rgba(0, 0, 0, 0.45);
+  --tray-border: 1px solid rgba(255, 255, 255, 0.08);
+  --tray-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.45);
+
+  /* Liquid Glass Harmonies */
+  --color-neon: #00ff88;
+  --color-neon-dim: rgba(0, 255, 136, 0.12);
+  --color-neon-glow: rgba(0, 255, 136, 0.32);
+  --color-cyan: #06b6d4;
+  --color-cyan-glow: rgba(6, 182, 212, 0.28);
+  --color-amber: #f59e0b;
+  --color-amber-glow: rgba(245, 158, 11, 0.28);
+
+  /* Typography */
+  --font-dot: 'YantarDot', 'Doto', monospace;
+  --font-ui: 'Sora', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-tech: 'Space Grotesk', monospace;
+
+  --text-main: #f3f4f6;
+  --text-muted: #9ca3af;
+  --text-dim: #6b7280;
+
+  --radius-lg: 22px;
+  --radius-md: 16px;
+  --radius-sm: 12px;
+  --radius-pill: 9999px;
+
+  --spring: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  font-family: var(--font-ui);
+  letter-spacing: -0.012em;
+  line-height: 1.55;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Spatial LED Dot-Matrix Grid & Ambient Glow */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: 
+    radial-gradient(circle at 50% -10%, rgba(0, 255, 136, 0.08) 0%, transparent 55%),
+    radial-gradient(circle at 85% 30%, rgba(6, 182, 212, 0.05) 0%, transparent 45%),
+    radial-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 26px 26px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.ambient-spotlight {
+  position: fixed;
+  width: 600px;
+  height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0, 255, 136, 0.05) 0%, transparent 70%);
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  z-index: 0;
+  transition: left 0.2s ease, top 0.2s ease;
+}
+
+#bg-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.app-container {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 620px;
+  margin: 0 auto;
+  padding: 20px 16px 40px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ==========================================================================
+   Header & HUD Console
+   ========================================================================== */
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 0 14px;
+}
+
+.dot-badge {
+  font-family: var(--font-dot);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  padding: 6px 13px;
+  border-radius: var(--radius-pill);
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: var(--text-main);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2);
+}
+
+.status-pip {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-neon);
+  box-shadow: 0 0 8px var(--color-neon);
+  animation: pulsePip 2.2s infinite ease-in-out;
+}
+
+@keyframes pulsePip {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.8); }
+}
+
+.hud-telemetry {
+  font-family: var(--font-dot);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: var(--color-neon);
+  text-transform: uppercase;
+}
+
+/* Progress Track */
+.progress-track {
+  width: 100%;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--color-neon), var(--color-cyan));
+  box-shadow: 0 0 10px var(--color-neon-glow);
+  transition: width 0.4s var(--spring);
+}
+
+/* ==========================================================================
+   VisionOS Glass Card
+   ========================================================================== */
+.glass-card {
+  background: var(--glass-bg);
+  background-image: var(--glass-surface);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: var(--glass-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--glass-shadow);
+  padding: 28px 24px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  animation: cardEnter 0.35s var(--spring) forwards;
+}
+
+@keyframes cardEnter {
+  from { opacity: 0; transform: translateY(8px) scale(0.992); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (max-width: 480px) {
+  .glass-card {
+    padding: 22px 18px;
+  }
+}
+
+/* ==========================================================================
+   Onboarding Flow (Swiss Telemetry Style)
+   ========================================================================== */
+.step-bars {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 24px;
+}
+
+.step-bar {
+  height: 3px;
+  flex: 1;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.12);
+  transition: all 0.35s ease;
+}
+
+.step-bar.active {
+  background: var(--color-neon);
+  box-shadow: 0 0 8px var(--color-neon-glow);
+}
+
+/* Custom HUD SVG Container */
+.hud-visual-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 0 24px;
+}
+
+.hud-ring-svg {
+  width: 110px;
+  height: 110px;
+  filter: drop-shadow(0 0 16px rgba(0, 255, 136, 0.22));
+}
+
+.hud-ring-spin {
+  transform-origin: center;
+  animation: spinSlow 18s linear infinite;
+}
+
+.hud-ring-pulse {
+  transform-origin: center;
+  animation: pulseRing 3s ease-in-out infinite alternate;
+}
+
+@keyframes spinSlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulseRing {
+  0% { transform: scale(0.94); opacity: 0.7; }
+  100% { transform: scale(1.04); opacity: 1; }
+}
+
+.dot-h1 {
+  font-family: var(--font-dot);
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.28;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: #ffffff;
+  margin-bottom: 14px;
+}
+
+.ui-body {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--text-muted);
+  line-height: 1.65;
+  margin-bottom: 24px;
+}
+
+/* Recessed Info Tray */
+.recessed-tray {
+  background: var(--tray-bg);
+  border: var(--tray-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--tray-shadow);
+  padding: 16px 18px;
+  margin-bottom: 26px;
+}
+
+.tray-label {
+  font-family: var(--font-dot);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  color: var(--color-amber);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tray-text {
+  font-family: var(--font-ui);
+  font-size: 13.5px;
+  color: #d1d5db;
+  line-height: 1.55;
+}
+
+/* ==========================================================================
+   Question View & Glass Chips
+   ========================================================================== */
+.q-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  gap: 10px;
+}
+
+.stage-dot-label {
+  font-family: var(--font-dot);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--color-neon);
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.select-pill-counter {
+  font-family: var(--font-tech);
+  font-size: 11.5px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-cyan);
+  background: rgba(6, 182, 212, 0.1);
+  border: 1px solid rgba(6, 182, 212, 0.25);
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+}
+
+.q-title {
+  font-family: var(--font-ui);
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1.42;
+  color: #ffffff;
+  margin-bottom: 22px;
+  letter-spacing: -0.02em;
+}
+
+/* VisionOS Glass Chips */
+.options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.option-chip {
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  cursor: pointer;
+  transition: all 0.2s var(--spring);
+  user-select: none;
+}
+
+.option-chip:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.22);
+  transform: translateY(-1px);
+}
+
+.option-chip:active {
+  transform: scale(0.985);
+}
+
+.option-chip.selected {
+  background: var(--color-neon-dim);
+  border-color: var(--color-neon);
+  box-shadow: 0 0 18px rgba(0, 255, 136, 0.22);
+}
+
+.opt-key {
+  font-family: var(--font-tech);
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+  transition: all 0.2s ease;
+  margin-top: 1px;
+}
+
+.option-chip.selected .opt-key {
+  background: var(--color-neon);
+  color: #050806;
+  border-color: var(--color-neon);
+}
+
+.opt-text {
+  font-family: var(--font-ui);
+  font-size: 14.5px;
+  font-weight: 400;
+  color: #e5e7eb;
+  line-height: 1.48;
+  flex: 1;
+}
+
+.option-chip.selected .opt-text {
+  color: #ffffff;
+  font-weight: 500;
+}
+
+/* ==========================================================================
+   Buttons (Aura Glass Spec)
+   ========================================================================== */
+.card-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: 16px;
+  gap: 12px;
+}
+
+.btn-translucent {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-main);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-pill);
+  padding: 12px 20px;
+  font-family: var(--font-ui);
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.btn-translucent:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.32);
+}
+
+.btn-luminous-jade {
+  background: var(--color-neon);
+  color: #050806;
+  font-family: var(--font-ui);
+  font-size: 14.5px;
+  font-weight: 700;
+  border: none;
+  border-radius: var(--radius-pill);
+  padding: 13px 26px;
+  box-shadow: 0 0 24px rgba(0, 255, 136, 0.35);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s var(--spring);
+  flex: 1;
+}
+
+.btn-luminous-jade:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 32px rgba(0, 255, 136, 0.55);
+}
+
+.btn-luminous-jade:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* ==========================================================================
+   Interstitial View
+   ========================================================================== */
+.interstitial-wrap {
+  text-align: center;
+  padding: 24px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+}
+
+/* ==========================================================================
+   Result Screen
+   ========================================================================== */
+.result-focus-card {
+  background: rgba(0, 255, 136, 0.05);
+  border: 1px solid rgba(0, 255, 136, 0.28);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 8px 30px rgba(0, 255, 136, 0.08);
+}
+
+.focus-dot-title {
+  font-family: var(--font-dot);
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  color: var(--color-neon);
+  margin: 6px 0 10px;
+  text-transform: uppercase;
+}
+
+.chain-monospaced {
+  font-family: var(--font-tech);
+  font-size: 14px;
+  color: #e5e7eb;
+  line-height: 1.6;
+}
+
+.request-card {
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.08) 0%, rgba(0, 255, 136, 0.04) 100%);
+  border: 1px solid rgba(6, 182, 212, 0.35);
+  border-radius: var(--radius-md);
+  padding: 18px 20px;
+  margin-bottom: 22px;
+}
+
+.request-quote {
+  font-family: var(--font-ui);
+  font-size: 16px;
+  font-weight: 600;
+  color: #ffffff;
+  line-height: 1.55;
+}
+
+.explore-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.explore-item {
+  font-size: 14px;
+  color: #d1d5db;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  line-height: 1.5;
+}
+
+.btn-telegram-action {
+  background: linear-gradient(135deg, #0088cc, #0077b5);
+  color: #ffffff;
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  border: none;
+  border-radius: var(--radius-pill);
+  padding: 15px 24px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  box-shadow: 0 4px 20px rgba(0, 136, 204, 0.4);
+  transition: all 0.2s var(--spring);
+}
+
+.btn-telegram-action:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 28px rgba(0, 136, 204, 0.6);
+}
+
+/* Contact Matrix Grid */
+.contact-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.contact-tile {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  padding: 12px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-decoration: none;
+  color: var(--text-main);
+  font-family: var(--font-ui);
+  font-size: 11.5px;
+  font-weight: 600;
+  text-align: center;
+  transition: all 0.2s var(--spring);
+}
+
+.contact-tile:hover {
+  background: rgba(0, 255, 136, 0.08);
+  border-color: rgba(0, 255, 136, 0.35);
+  transform: translateY(-2px);
+}
+
+.contact-tile svg {
+  color: var(--color-neon);
+}
+
+/* ==========================================================================
+   Mobile & In-App Browser (Instagram WebView) Optimizations
+   ========================================================================== */
+@media (max-width: 440px) {
+  .app-container {
+    padding: 14px 12px calc(28px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .app-header {
+    gap: 8px;
+    padding: 2px 0 12px;
+  }
+
+  .dot-badge {
+    font-size: 9.5px;
+    letter-spacing: 1.1px;
+    padding: 5px 10px;
+    white-space: nowrap;
+  }
+
+  .hud-telemetry {
+    font-size: 9.5px;
+    letter-spacing: 1.1px;
+    white-space: nowrap;
+  }
+
+  .glass-card {
+    padding: 20px 16px;
+    border-radius: 20px;
+  }
+
+  .hud-visual-box {
+    padding: 8px 0 16px;
+  }
+
+  .hud-ring-svg {
+    width: 88px;
+    height: 88px;
+  }
+
+  .dot-h1 {
+    font-size: 20px;
+    line-height: 1.3;
+    letter-spacing: 0.9px;
+    margin-bottom: 12px;
+  }
+
+  .ui-body {
+    font-size: 14px;
+    line-height: 1.55;
+    margin-bottom: 18px;
+  }
+
+  .recessed-tray {
+    padding: 14px 15px;
+    margin-bottom: 20px;
+  }
+
+  .q-title {
+    font-size: 17px;
+    margin-bottom: 16px;
+  }
+
+  .option-chip {
+    padding: 12px 14px;
+    gap: 11px;
+    border-radius: 14px;
+  }
+
+  .opt-text {
+    font-size: 13.5px;
+  }
+
+  .btn-luminous-jade {
+    padding: 13px 18px;
+    font-size: 14px;
+  }
+
+  .btn-translucent {
+    padding: 12px 16px;
+    font-size: 13px;
+  }
+}
