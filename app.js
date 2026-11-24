@@ -3,7 +3,7 @@
 // ==========================================================================
 
 const CONTACTS = {
-  telegramDirect: 'https://t.me/sathez',
+  telegramDirect: 'https://t.me/santhez',
   telegramChannel: 'https://t.me/brainseareal',
   instagram: 'https://instagram.com/solyansky_psy'
 };
@@ -611,10 +611,9 @@ const APP = {
     `).join('');
 
     const tgMessage = encodeURIComponent(
-      `Привет, Александр! Я прошёл тест «От жалобы к запросу».\n\n` +
-      `Мой результат: ${d.title}\n` +
+      `Добрый день, Александр! Прошёл тест «От жалобы к запросу» (мой фокус: ${d.title}).\n\n` +
       `Мой запрос: «${d.request}»\n\n` +
-      `Хочу записаться на бесплатную демо-сессию.`
+      `Хотел бы записаться на бесплатную демо-сессию.`
     );
 
     const tgUrl = `${CONTACTS.telegramDirect}?text=${tgMessage}`;
