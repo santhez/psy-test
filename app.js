@@ -620,11 +620,7 @@ const APP = {
       </li>
     `).join('');
 
-    const tgMessage = encodeURIComponent(
-      `Добрый день, Александр! Прошёл тест «От жалобы к запросу» (мой фокус: ${d.title}).\n\n` +
-      `Мой запрос: «${d.request}»\n\n` +
-      `Хотел бы записаться на бесплатную демо-сессию.`
-    );
+    const tgMessage = encodeURIComponent('Добрый день! Я прошёл тест и хочу записаться на демо-сессию.');
 
     const tgUrl = `${CONTACTS.telegramDirect}?text=${tgMessage}`;
 
